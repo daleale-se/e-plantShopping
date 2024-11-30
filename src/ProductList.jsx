@@ -1,9 +1,12 @@
-import React, { useState,useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import './ProductList.css'
 import CartItem from './CartItem';
+import addItem from 'CartSlice.jsx';
+
 function ProductList() {
     const [showCart, setShowCart] = useState(false); 
     const [showPlants, setShowPlants] = useState(false); // State to control the visibility of the About Us page
+    const [addedToCart, setAddedToCart] = useState({})
 
     const plantsArray = [
         {
@@ -212,6 +215,7 @@ function ProductList() {
             ]
         }
     ];
+
    const styleObj={
     backgroundColor: '#4CAF50',
     color: '#fff!important',
@@ -232,20 +236,31 @@ function ProductList() {
     fontSize: '30px',
     textDecoration: 'none',
    }
+
+   const handleAddToCart = (product) => {
+        dispatch(addItem(product));
+        setAddedToCart((prevState) => ({
+        ...prevState,
+        [product.name]: true, // Set the product name as key and value as true to indicate it's added to cart
+        }));
+   }
+
    const handleCartClick = (e) => {
     e.preventDefault();
     setShowCart(true); // Set showCart to true when cart icon is clicked
-};
-const handlePlantsClick = (e) => {
-    e.preventDefault();
-    setShowPlants(true); // Set showAboutUs to true when "About Us" link is clicked
-    setShowCart(false); // Hide the cart when navigating to About Us
-};
+    };
+
+    const handlePlantsClick = (e) => {
+        e.preventDefault();
+        setShowPlants(true); // Set showAboutUs to true when "About Us" link is clicked
+        setShowCart(false); // Hide the cart when navigating to About Us
+    };
 
    const handleContinueShopping = (e) => {
     e.preventDefault();
     setShowCart(false);
   };
+
     return (
         <div>
              <div className="navbar" style={styleObj}>
@@ -268,7 +283,22 @@ const handlePlantsClick = (e) => {
         </div>
         {!showCart? (
         <div className="product-grid">
-
+            {plantsArray.map((type) => {
+                return <div key={type.category}>
+                    <h2 style={{fontSize:'1.5rem', marginBottom:'1.5rem'}}>{type.category}</h2>
+                    <div style={{display:'flex', flexWrap:'wrap', gap:'1rem', justifyContent:'center'}}>
+                        {type.plants.map((plant) => {
+                            return <div key={plant.name} style={{width:'16rem'}}>
+                                <img src={plant.image} alt={plant.name} style={{width:'100%', height:'60%'}}/>
+                                <h3 style={{fontSize:'1rem', marginBottom:'1rem'}}>{plant.name}</h3>
+                                <p style={{fontStyle:'italic'}}>{plant.description}</p>
+                                <p style={{fontWeight:'bold'}}>{plant.cost}</p>
+                                <button style={{padding:'.5rem'}} onClick={() => handleAddToCart(plant)}>add to cart</button>
+                            </div>
+                        })}
+                    </div>
+                </div>
+            })}
 
         </div>
  ) :  (
